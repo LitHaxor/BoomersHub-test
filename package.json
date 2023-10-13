@@ -1,0 +1,19 @@
+{
+  "name": "boomershub-test",
+  "version": "0.0.1-alpha",
+  "description": "Boomershub-geospatial",
+  "main": "src/main.ts",
+  "scripts": {
+    "start": "tsc && node dist/main.js"
+  },
+  "author": "Hasan Ahamed",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.428.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.5"
+  }
+}

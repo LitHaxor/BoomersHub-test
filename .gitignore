@@ -1,0 +1,5 @@
+.env
+*.docx
+*.csv
+node_modules/
+*.log
