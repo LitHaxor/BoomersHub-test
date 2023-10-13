@@ -3,7 +3,7 @@ import { createReadStream, readdirSync } from "fs";
 import { join } from "path";
 
 async function uploadImagesFromFolders(path: string) {
-  const imagePath = join(__dirname, "src", path);
+  const imagePath = join(__dirname, path);
   const folders = readdirSync(imagePath);
 
   for await (const folder of folders) {
