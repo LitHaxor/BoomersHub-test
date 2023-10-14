@@ -4,16 +4,26 @@
   "description": "Boomershub-geospatial",
   "main": "src/main.ts",
   "scripts": {
-    "start": "tsc && node dist/main.js"
+    "start": "ts-node src/main.ts",
+    "dev": "nodemon src/main.ts"
   },
   "author": "Hasan Ahamed",
   "license": "MIT",
   "private": false,
   "dependencies": {
     "@aws-sdk/client-s3": "^3.428.0",
-    "dotenv": "^16.3.1"
+    "axios": "^1.5.1",
+    "cheerio": "^1.0.0-rc.12",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mysql2": "^3.6.1",
+    "nodemon": "^3.0.1",
+    "typeorm": "^0.3.17",
+    "typeorm-naming-strategies": "^4.1.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.19",
     "@types/node": "^20.8.5"
   }
 }
