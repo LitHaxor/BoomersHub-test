@@ -1,4 +1,5 @@
 import { PORT } from "./configs";
+import cors from "cors";
 import express from "express";
 import { setupDatabase } from "./database";
 import searchRouter from "./routes/search.router";
@@ -10,9 +11,15 @@ async function bootstrap() {
   await setupDatabase();
 
   app.use(express.json());
+  app.use(
+    cors({
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+    })
+  );
 
   app.use("/api/search", searchRouter);
-  app.use("/api/property", propertyRouter);
+  app.use("/api/providers", propertyRouter);
   app.use("/api/images", imagesRouter);
 
   app.listen(PORT, () => {

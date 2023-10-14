@@ -1,4 +1,5 @@
-export type SearchDto = {
+export type ProviderDto = {
+  id?: number;
   name: string;
   address: string;
   city: string;
@@ -10,4 +11,15 @@ export type SearchDto = {
   capacity: number;
   images: string;
   phone: string;
+  state?: string;
+  isSaved?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type ProviderGetDto = {
+  count: number;
+  providers: ProviderDto[];
+  limit: number;
+  offset: number;
 };

@@ -1,12 +1,12 @@
 import express, { Request, Response, NextFunction } from "express";
-import { Property } from "../entities/Property.entity";
+import { Provider } from "../entities/Provider.entity";
 import { AppDataSource } from "../database";
 
-const propertyRouter = express.Router();
-const propertyRepository = AppDataSource.getRepository(Property);
+const providerRouter = express.Router();
+const providerRepository = AppDataSource.getRepository(Provider);
 
 interface CustomRequest extends Request {
-  property?: Property;
+  property?: Provider;
 }
 
 const findPropertyById = async (
@@ -15,55 +15,108 @@ const findPropertyById = async (
   next: NextFunction
 ) => {
   const { id } = req.params;
-  const property = await propertyRepository.findOne({
+  const provider = await providerRepository.findOne({
     where: { id: parseInt(id) },
   });
 
-  if (!property) {
+  if (!provider) {
     res.status(404).json({ message: "Property not found" });
   }
 
-  req.property = property ? property : undefined;
+  req.property = provider ? provider : undefined;
   next();
 };
 
-propertyRouter.get("/", async (_, res) => {
-  const properties = await propertyRepository.find();
-  res.json(properties);
+providerRouter.get("/", async (req, res) => {
+  try {
+    const {
+      q,
+      limit = 10,
+      offset = 0,
+    } = req.query as {
+      q: string;
+      limit: string;
+      offset: string;
+    };
+    const queryOption = providerRepository
+      .createQueryBuilder("provider")
+      .take(Number(limit || 10))
+      .skip(Number(offset || 0));
+
+    if (q) {
+      queryOption.andWhere("provider.name ILIKE :query", {
+        query: `%${q}%`,
+      });
+      queryOption.orWhere("provider.address ILIKE :query", {
+        query: `%${q}%`,
+      });
+      queryOption.orWhere("provider.city ILIKE :query", {
+        query: `%${q}%`,
+      });
+      queryOption.orWhere("provider.zip ILIKE :query", { query: `%${q}%` });
+      queryOption.orWhere("provider.country ILIKE :query", {
+        query: `%${q}%`,
+      });
+      queryOption.orWhere("provider.type ILIKE :query", {
+        query: `%${q}%`,
+      });
+    }
+
+    const [providers, count] = await queryOption.getManyAndCount();
+
+    return res.json({
+      providers,
+      count,
+      limit: Number(limit),
+      offset: Number(offset),
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
 });
 
-propertyRouter.post("/", async (req, res) => {
-  const propertyData = req.body as Property;
-  const newProperty = await propertyRepository.save(propertyData);
-  res.json({ message: "Property created successfully", property: newProperty });
+providerRouter.post("/", async (req, res) => {
+  try {
+    const providerData = req.body as Provider;
+
+    const newProvider = await providerRepository.save(providerData);
+    return res.json({
+      message: "Property created successfully",
+      provider: newProvider,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
 });
 
-propertyRouter.get("/:id", findPropertyById, (req: CustomRequest, res) => {
+providerRouter.get("/:id", findPropertyById, (req: CustomRequest, res) => {
   res.json(req.property);
 });
 
-propertyRouter.put(
+providerRouter.put(
   "/:id",
   findPropertyById,
   async (req: CustomRequest, res) => {
-    const updatedPropertyData = { ...req.property, ...req.body };
-    const updatedProperty = await propertyRepository.save(updatedPropertyData);
+    const updatedProviderData = { ...req.property, ...req.body };
+    const updatedProvider = await providerRepository.save(updatedProviderData);
     res.json({
-      message: "Property updated successfully",
-      property: updatedProperty,
+      message: "Provider updated successfully",
+      provider: updatedProvider,
     });
   }
 );
 
-propertyRouter.delete(
+providerRouter.delete(
   "/:id",
   findPropertyById,
   async (req: CustomRequest, res) => {
-    await propertyRepository.delete({
+    await providerRepository.delete({
       id: req.property?.id,
     });
     res.json({ message: "Property deleted successfully" });
   }
 );
 
-export default propertyRouter;
+export default providerRouter;

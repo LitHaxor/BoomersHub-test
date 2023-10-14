@@ -1,14 +1,62 @@
 import { baseApi } from "@/baseApi";
-import { SearchDto } from "@/dto/search.dto";
+import { ProviderDto } from "@/dto/search.dto";
 import { NextPageContext } from "next";
 import React from "react";
-import { Button, Drawer, Layout, Space, Table } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Drawer,
+  Layout,
+  Row,
+  Space,
+  Table,
+  message,
+} from "antd";
 import { ColumnsType } from "antd/es/table";
+import Head from "next/head";
+import ProviderView from "@/components/Drawers/ProviderView";
 
-const SearchProvider = ({ data }: { data: SearchDto[] }) => {
-  const [selectedRecord, setSelectedRecord] = React.useState<SearchDto>();
+const SearchProvider = ({
+  data,
+  query,
+  state,
+}: {
+  data: ProviderDto[];
+  query: string;
+  state: string;
+}) => {
+  const [selectedRecord, setSelectedRecord] = React.useState<ProviderDto>();
+  const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>([]);
+  const [providers, setProviders] = React.useState<ProviderDto[]>(data);
 
-  const columns: ColumnsType<SearchDto> = [
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
+  const singleSave = async (record: ProviderDto) => {
+    try {
+      const { data } = await baseApi.post("/providers", record);
+      const newProviders = providers.map((provider) => {
+        if (provider.phone === record.phone) {
+          return { ...provider, isSaved: true };
+        }
+        return provider;
+      });
+      message.success(data.message);
+      setProviders(newProviders);
+    } catch (error) {
+      console.log(error);
+      message.error("Failed to save provider");
+    }
+  };
+
+  const columns: ColumnsType<ProviderDto> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -34,7 +82,6 @@ const SearchProvider = ({ data }: { data: SearchDto[] }) => {
       dataIndex: "zip",
       key: "zip",
     },
-
     {
       title: "Phone",
       dataIndex: "phone",
@@ -51,14 +98,11 @@ const SearchProvider = ({ data }: { data: SearchDto[] }) => {
       render: (_, record) => {
         return (
           <Space>
-            <Button
-              onClick={() => {
-                baseApi.post("/property", record);
-              }}
-              type="primary"
-            >
-              Save
-            </Button>
+            {!record.isSaved && (
+              <Button onClick={() => singleSave(record)} type="primary">
+                Save
+              </Button>
+            )}
             <Button
               onClick={() => {
                 setSelectedRecord(record);
@@ -75,28 +119,46 @@ const SearchProvider = ({ data }: { data: SearchDto[] }) => {
 
   return (
     <>
-      <Layout.Header>
-        <Space>
-          <Button type="primary">Save Selected</Button>
-          <Button color="#">Show Saved</Button>
-        </Space>
-      </Layout.Header>
-
-      <Layout.Content>
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowKey={(record) => record.phone}
-        />
+      <Head>
+        <title>BoomersHub - Search</title>
+      </Head>
+      <Layout.Content style={{ padding: "10px" }}>
+        <Card
+          title={`Showing results for "${query}" in ${state}`}
+          style={{ borderRadius: 10, boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}
+        >
+          <Table
+            columns={columns}
+            dataSource={providers}
+            rowKey={(record) => record.phone}
+            rowSelection={rowSelection}
+            footer={() => (
+              <Row justify="center">
+                <Space>
+                  <Col>
+                    <Button type="primary">View Saved Providers</Button>
+                  </Col>
+                  {selectedRowKeys.length > 0 && (
+                    <Col>
+                      <Button danger>Save Selected Providers</Button>
+                    </Col>
+                  )}
+                </Space>
+              </Row>
+            )}
+          />
+        </Card>
       </Layout.Content>
-
       <Drawer
-        width={640}
+        title="Provider Details"
+        width={600}
         placement="right"
-        closable={false}
+        closable={true}
         onClose={() => setSelectedRecord(undefined)}
-        visible={!!selectedRecord}
-      ></Drawer>
+        open={!!selectedRecord}
+      >
+        {selectedRecord && <ProviderView selectedProvider={selectedRecord} />}
+      </Drawer>
     </>
   );
 };
@@ -106,7 +168,7 @@ export default SearchProvider;
 export async function getServerSideProps(context: NextPageContext) {
   try {
     const { query } = context;
-    const { data } = await baseApi.post<SearchDto[]>("/search", {
+    const { data } = await baseApi.post<ProviderDto[]>("/search", {
       query: query.q,
       type: query.state,
     });
@@ -114,6 +176,8 @@ export async function getServerSideProps(context: NextPageContext) {
     return {
       props: {
         data,
+        query: query.q,
+        state: query.state,
       },
     };
   } catch (error) {

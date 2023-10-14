@@ -10,30 +10,34 @@ import {
   Row,
   Col,
   Select,
+  Space,
 } from "antd";
 import Image from "next/image";
 import { baseApi } from "@/baseApi";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 export default function Home({ images }: { images: string[] }) {
   const router = useRouter();
 
   return (
     <>
+      <Head>
+        <title>BoomersHub</title>
+        <meta name="description" content="BoomersHub" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <main>
-        <Layout.Header>
-          <Typography.Title
-            level={2}
-            style={{ color: "#fff", textAlign: "center" }}
-          >
-            Boomersclub
-          </Typography.Title>
-        </Layout.Header>
-
-        <Layout.Content style={{ marginTop: "5px" }}>
+        <Layout.Content style={{ margin: "10px 10px" }}>
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={16}>
-              <Carousel autoplay>
+              <Carousel
+                autoplay
+                style={{
+                  borderRadius: 10,
+                  boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+                }}
+              >
                 {images.map((image) => (
                   <div
                     key={image}
@@ -53,7 +57,13 @@ export default function Home({ images }: { images: string[] }) {
               </Carousel>
             </Col>
             <Col xs={24} sm={8}>
-              <Card>
+              <Card
+                title="Find a provider"
+                style={{
+                  borderRadius: 10,
+                  boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+                }}
+              >
                 <Form
                   initialValues={{
                     state: "TEXAS",

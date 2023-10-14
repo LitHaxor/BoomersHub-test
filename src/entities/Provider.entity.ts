@@ -2,15 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { PropertySearch } from "./Property_Search.entity";
 
 @Entity()
-export class Property {
+export class Provider {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -32,33 +29,39 @@ export class Property {
   @Column()
   zip: string;
 
-  @Column()
+  @Column({
+    unique: true,
+    nullable: true,
+  })
   phone: string;
 
   @Column()
   type: string;
 
-  @Column()
-  capacity: number;
+  isSaved?: boolean;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
+  capacity?: number;
+
+  @Column({
+    type: "text",
+    nullable: true,
+  })
   images: string;
 
-  @Column()
+  @Column({
+    type: "float",
+    nullable: true,
+  })
   latitude: number;
 
-  @Column()
+  @Column({
+    type: "float",
+    nullable: true,
+  })
   longitude: number;
-
-  @Column()
-  property_search_id: number;
-
-  @ManyToOne(
-    () => PropertySearch,
-    (property_search) => property_search.properties
-  )
-  @JoinColumn({ name: "property_search_id" })
-  property_search: PropertySearch;
 
   @CreateDateColumn()
   createdAt: Date;

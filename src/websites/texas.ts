@@ -1,6 +1,6 @@
 import { CheerioAPI, load } from "cheerio";
-import { Property } from "../entities/Property.entity";
 import { loadHtml } from "../libs/scraper";
+import { Provider } from "src/entities/Provider.entity";
 
 export class TexasLTC {
   baseUrl = "https://apps.hhs.texas.gov/LTCSearch";
@@ -61,7 +61,7 @@ export class TexasLTC {
   }
 
   async scrapeBasePage($: CheerioAPI) {
-    const properties = [] as Property[];
+    const providers = [] as Provider[];
 
     const table = $("table.sortabletable");
     const rows = table.find("tr");
@@ -71,19 +71,19 @@ export class TexasLTC {
 
     rows.each((_, row) => {
       const columns = $(row).find("td");
-      const property = {} as Property;
+      const provider = {} as Provider;
 
       if (columns.length < 6) {
         return;
       }
 
-      property.name = $(columns[0]).text();
-      property.address = $(columns[1]).text();
-      property.city = $(columns[2]).text();
-      property.zip = $(columns[3]).text();
-      property.country = $(columns[4]).text();
-      property.type = $(columns[5]).text();
-      property.state = "Texas";
+      provider.name = $(columns[0]).text();
+      provider.address = $(columns[1]).text();
+      provider.city = $(columns[2]).text();
+      provider.zip = $(columns[3]).text();
+      provider.country = $(columns[4]).text();
+      provider.type = $(columns[5]).text();
+      provider.state = "Texas";
       const url = this.baseUrl + "/" + $(columns[0]).find("a").attr("href");
 
       if (url) {
@@ -91,9 +91,9 @@ export class TexasLTC {
         promises.push(
           this.scrapeDetailsPage(url).then((data) => {
             if (data && data?.capacity) {
-              property.capacity = data.capacity;
-              property.images = data.images;
-              property.phone = data.phone;
+              provider.capacity = data.capacity;
+              provider.images = data.images;
+              provider.phone = data.phone;
             }
           })
         );
@@ -101,21 +101,23 @@ export class TexasLTC {
 
       // Push the promise returned by getLatLong into the promises array
       promises.push(
-        this.getLatLong(property.address).then((data) => {
-          if (data) {
-            property.latitude = data.latitude;
-            property.longitude = data.longitude;
+        this.getLatLong(provider.address, provider.city, provider.state).then(
+          (data) => {
+            if (data) {
+              provider.latitude = data.latitude;
+              provider.longitude = data.longitude;
+            }
           }
-        })
+        )
       );
 
-      properties.push(property);
+      providers.push(provider);
     });
 
     // Wait for all promises to resolve before continuing
     await Promise.all(promises);
 
-    return properties;
+    return providers;
   }
 
   async scrapeDetailsPage(url: string) {
@@ -158,10 +160,11 @@ export class TexasLTC {
     return additionalInfo;
   }
 
-  async getLatLong(address: string) {
+  async getLatLong(address: string, city: string, state: string) {
     try {
+      const query = `${address} ${city} ${state}`;
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q="${address}"&format=json`
+        `https://nominatim.openstreetmap.org/search?q="${query}"&format=json`
       );
       const data = await res?.json();
 
