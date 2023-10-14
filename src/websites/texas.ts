@@ -15,38 +15,47 @@ export class TexasLTC {
   }
 
   private async searchRequest(query: string) {
-    const res = await fetch(`${this.baseUrl}/namesearch.cfm`, {
-      headers: {
-        accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "accept-language":
-          "en-GB,en;q=0.9,en-US;q=0.8,bn;q=0.7,fr;q=0.6,co;q=0.5",
-        "cache-control": "no-cache",
-        "content-type": "application/x-www-form-urlencoded",
-        pragma: "no-cache",
-        "sec-ch-ua":
-          '"Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "document",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-site": "same-origin",
-        "sec-fetch-user": "?1",
-        "upgrade-insecure-requests": "1",
-      },
-      referrer: "https://apps.hhs.texas.gov/LTCSearch/namesearch.cfm",
-      referrerPolicy: "strict-origin-when-cross-origin",
-      body: `searchterm=${query.replace(" ", "+")}&factype=all%2Call`,
-      method: "POST",
-      mode: "cors",
-      credentials: "include",
-    });
+    try {
+      const res = await fetch(`${this.baseUrl}/namesearch.cfm`, {
+        headers: {
+          accept:
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+          "accept-language":
+            "en-GB,en;q=0.9,en-US;q=0.8,bn;q=0.7,fr;q=0.6,co;q=0.5",
+          "cache-control": "no-cache",
+          "content-type": "application/x-www-form-urlencoded",
+          pragma: "no-cache",
+          "sec-ch-ua":
+            '"Google Chrome";v="117", "Not;A=Brand";v="8", "Chromium";v="117"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"macOS"',
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "same-origin",
+          "sec-fetch-user": "?1",
+          "upgrade-insecure-requests": "1",
+        },
+        referrer: "https://apps.hhs.texas.gov/LTCSearch/namesearch.cfm",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: `searchterm=${query.replace(" ", "+")}&factype=all%2Call`,
+        method: "POST",
+        mode: "cors",
+        credentials: "include",
+      });
 
-    return await res.text();
+      return load(await res.text());
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   async search(query: string) {
-    const $ = load(await this.searchRequest(query));
+    const $ = await this.searchRequest(query);
+
+    if (!$) {
+      return [];
+    }
 
     return await this.scrapeBasePage($);
   }
@@ -83,6 +92,7 @@ export class TexasLTC {
             if (data && data?.capacity) {
               property.capacity = data.capacity;
               property.images = data.images;
+              property.phone = data.phone;
             }
           })
         );
@@ -121,6 +131,7 @@ export class TexasLTC {
     const additionalInfo = {
       capacity: 0,
       images: "",
+      phone: "",
     };
 
     lists.each((_, list) => {
@@ -132,22 +143,39 @@ export class TexasLTC {
       }
     });
 
+    const phoneRegex = /\b\d{3}-\d{3}-\d{4}\b/;
+
+    // Use the regular expression to find the phone number in the HTML
+    const phoneMatches = $(".main-content").html()?.match(phoneRegex);
+
+    if (phoneMatches) {
+      const phoneNumber = phoneMatches[0];
+      additionalInfo.phone = phoneNumber;
+    } else {
+      console.log("Phone number not found in the HTML.");
+    }
+
     return additionalInfo;
   }
 
   async getLatLong(address: string) {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q="${address}"&format=json`
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q="${address}"&format=json`
+      );
+      const data = await res?.json();
 
-    if (data?.[0]?.lat && data?.[0]?.lon) {
-      return {
-        latitude: Number(data[0].lat),
-        longitude: Number(data[0].lon),
-      };
+      if (data?.[0]?.lat && data?.[0]?.lon) {
+        return {
+          latitude: Number(data[0].lat),
+          longitude: Number(data[0].lon),
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.log(error);
+      return null;
     }
-
-    return null;
   }
 }
