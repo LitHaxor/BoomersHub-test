@@ -8,6 +8,7 @@ import {
   S3Client,
   GetObjectCommand,
   PutObjectCommand,
+  ListObjectsCommand,
 } from "@aws-sdk/client-s3";
 
 const client = new S3Client({
@@ -64,3 +65,18 @@ export const uploadImageToS3 = async (file: any, folder: string) => {
     return null;
   }
 };
+
+export async function getUploadedImagesFromS3() {
+  const command = new ListObjectsCommand({
+    Bucket,
+    Prefix: "images",
+  });
+
+  const result = await client.send(command);
+
+  const imageUrls = result?.Contents?.map((content) => {
+    return `https://${Bucket}.s3.amazonaws.com/${content.Key}`;
+  });
+
+  return imageUrls;
+}

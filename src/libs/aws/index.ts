@@ -1,1 +1,1 @@
-export { uploadImageToS3 } from "./uploadToS3";
+export { uploadImageToS3, getUploadedImagesFromS3 } from "./uploadToS3";

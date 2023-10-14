@@ -83,6 +83,7 @@ export class TexasLTC {
       property.zip = $(columns[3]).text();
       property.country = $(columns[4]).text();
       property.type = $(columns[5]).text();
+      property.state = "Texas";
       const url = this.baseUrl + "/" + $(columns[0]).find("a").attr("href");
 
       if (url) {
