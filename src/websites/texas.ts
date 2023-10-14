@@ -145,7 +145,6 @@ export class TexasLTC {
 
     const phoneRegex = /\b\d{3}-\d{3}-\d{4}\b/;
 
-    // Use the regular expression to find the phone number in the HTML
     const phoneMatches = $(".main-content").html()?.match(phoneRegex);
 
     if (phoneMatches) {
