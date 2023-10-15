@@ -3,8 +3,10 @@ import cors from "cors";
 import express from "express";
 import { setupDatabase } from "./database";
 import searchRouter from "./routes/search.router";
-import providerRouter from "./routes/property.router";
+import providerRouter from "./routes/provider.router";
 import imagesRouter from "./routes/images.router";
+import { errorHandler } from "./middlewares/error.handler";
+import "express-async-errors";
 
 async function bootstrap() {
   const app = express();
@@ -17,6 +19,8 @@ async function bootstrap() {
   app.use("/api/images", imagesRouter);
 
   await setupDatabase();
+
+  app.use(errorHandler);
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { Provider } from "../entities/Provider.entity";
 import { AppDataSource } from "../database";
+import HttpRequestError from "../errors/HttpRequestError";
 
 const providerRouter = express.Router();
 const providerRepository = AppDataSource.getRepository(Provider);
@@ -11,7 +12,7 @@ interface CustomRequest extends Request {
 
 const findPropertyById = async (
   req: CustomRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   const { id } = req.params;
@@ -20,7 +21,10 @@ const findPropertyById = async (
   });
 
   if (!provider) {
-    res.status(404).json({ message: "Property not found" });
+    throw new HttpRequestError({
+      code: 404,
+      message: `Provider with id ${id} not found`,
+    });
   }
 
   req.property = provider ? provider : undefined;
@@ -77,18 +81,13 @@ providerRouter.get("/", async (req, res) => {
 });
 
 providerRouter.post("/", async (req, res) => {
-  try {
-    const providerData = req.body as Provider;
+  const providerData = req.body as Provider;
 
-    const newProvider = await providerRepository.save(providerData);
-    return res.json({
-      message: "Property created successfully",
-      provider: newProvider,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
-  }
+  const newProvider = await providerRepository.save(providerData);
+  return res.json({
+    message: "Provider saved!",
+    provider: newProvider,
+  });
 });
 
 providerRouter.get("/:id", findPropertyById, (req: CustomRequest, res) => {

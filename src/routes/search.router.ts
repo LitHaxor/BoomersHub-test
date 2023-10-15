@@ -9,29 +9,24 @@ const searchRouter = express.Router();
 const providerRepositry = AppDataSource.getRepository(Provider);
 
 searchRouter.post("/", async (req, res) => {
-  try {
-    const body = req.body as SearchDto;
+  const body = req.body as SearchDto;
 
-    const data = await Websites[body.type].search(body.query);
+  const data = await Websites[body.type].search(body.query);
 
-    const phoneNumbers = data.map((property) => property.phone);
+  const phoneNumbers = data.map((property) => property.phone);
 
-    const savedProviders = await providerRepositry
-      .createQueryBuilder("property")
-      .where("property.phone IN (:...phoneNumbers)", { phoneNumbers })
-      .getMany();
+  const savedProviders = await providerRepositry
+    .createQueryBuilder("property")
+    .where("property.phone IN (:...phoneNumbers)", { phoneNumbers })
+    .getMany();
 
-    const savedPhoneNumbers = savedProviders.map((provider) => provider.phone);
+  const savedPhoneNumbers = savedProviders.map((provider) => provider.phone);
 
-    data.forEach((proivder) => {
-      proivder.isSaved = savedPhoneNumbers.includes(proivder.phone);
-    });
+  data.forEach((proivder) => {
+    proivder.isSaved = savedPhoneNumbers.includes(proivder.phone);
+  });
 
-    return res.json(data);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
+  return res.json(data);
 });
 
 export default searchRouter;
