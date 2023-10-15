@@ -16,6 +16,7 @@ import {
 import { ColumnsType } from "antd/es/table";
 import Head from "next/head";
 import ProviderView from "@/components/Drawers/ProviderView";
+import Link from "next/link";
 
 const SearchProvider = ({
   data,
@@ -136,7 +137,9 @@ const SearchProvider = ({
               <Row justify="center">
                 <Space>
                   <Col>
-                    <Button type="primary">View Saved Providers</Button>
+                    <Button type="primary">
+                      <Link href={"/provider"}>Saved Providers</Link>
+                    </Button>
                   </Col>
                   {selectedRowKeys.length > 0 && (
                     <Col>
