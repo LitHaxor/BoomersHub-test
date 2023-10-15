@@ -7,9 +7,11 @@ COPY package.json yarn.lock ./
 
 RUN yarn install
 
-RUN yarn add ts-node -g
 
 COPY . .
+
+RUN yarn add ts-node -g
+
 
 RUN npx playwright install chromium
 
