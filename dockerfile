@@ -12,6 +12,7 @@ COPY . .
 
 RUN yarn add ts-node typescript -g
 
+RUN yarn playwright install-deps 
 
 RUN npx playwright install chromium
 
