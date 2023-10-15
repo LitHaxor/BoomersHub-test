@@ -14,14 +14,4 @@ ENV NODE_ENV=production
 
 RUN yarn build
 
-# Production stage
-FROM node:18-alpine as production-stage
-
-WORKDIR /app
-
-COPY --from=build-stage /app/package*.json yarn.lock ./
-COPY --from=build-stage /app/.next ./.next
-COPY --from=build-stage /app/public ./public
-COPY --from=build-stage /app/node_modules ./node_modules
-
-ENV NODE_ENV=production
+CMD [ "yarn", "start" ]
