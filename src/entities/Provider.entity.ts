@@ -23,8 +23,10 @@ export class Provider {
   @Column()
   state: string;
 
-  @Column()
-  country: string;
+  @Column({
+    nullable: true,
+  })
+  country?: string;
 
   @Column()
   zip: string;

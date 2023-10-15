@@ -1,6 +1,7 @@
 import { CheerioAPI, load } from "cheerio";
 import { loadHtml } from "../libs/scraper";
-import { Provider } from "src/entities/Provider.entity";
+import { Provider } from "../entities/Provider.entity";
+import { getLatLong } from "../libs/geo";
 
 export class TexasLTC {
   baseUrl = "https://apps.hhs.texas.gov/LTCSearch";
@@ -101,7 +102,7 @@ export class TexasLTC {
 
       // Push the promise returned by getLatLong into the promises array
       promises.push(
-        this.getLatLong(provider.address, provider.city, provider.state).then(
+        getLatLong(provider.address, provider.city, provider.state).then(
           (data) => {
             if (data) {
               provider.latitude = data.latitude;
@@ -158,27 +159,5 @@ export class TexasLTC {
     }
 
     return additionalInfo;
-  }
-
-  async getLatLong(address: string, city: string, state: string) {
-    try {
-      const query = `${address} ${city} ${state}`;
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q="${query}"&format=json`
-      );
-      const data = await res?.json();
-
-      if (data?.[0]?.lat && data?.[0]?.lon) {
-        return {
-          latitude: Number(data[0].lat),
-          longitude: Number(data[0].lon),
-        };
-      }
-
-      return null;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
   }
 }

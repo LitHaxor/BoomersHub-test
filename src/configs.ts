@@ -16,3 +16,6 @@ export const MYSQL_PORT: number = Number(process.env.MYSQL_PORT) || 3306;
 export const MYSQL_USER: string = process.env.MYSQL_USER || "";
 export const MYSQL_PASSWORD: string = process.env.MYSQL_PASSWORD || "";
 export const MYSQL_DB: string = process.env.MYSQL_DB || "";
+// PROXY
+
+export const PROXY_API: string = process.env.PROXY_API || "";
