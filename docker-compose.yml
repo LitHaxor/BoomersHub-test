@@ -4,9 +4,9 @@ services:
   backend:
     image: lithasan/boomers-hub:latest
     ports:
-      - "5000:5000"
+      - "4000:4000"
     environment:
-      - PORT=5000
+      - PORT=4000
       - NODE_ENV=production
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
@@ -17,6 +17,8 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DB=${MYSQL_DB}
     command: ["yarn", "start"]
+    depends_on:
+      - mysql
     
 
   mysql:
