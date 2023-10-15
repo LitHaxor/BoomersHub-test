@@ -58,6 +58,18 @@ const ProviderList = ({
     }
   };
 
+  const search = async (query: string) => {
+    try {
+      const { data } = await baseApi.get<ProviderGetDto>(
+        `/providers?q=${query}`
+      );
+      setProviders(data.providers);
+    } catch (error) {
+      console.log(error);
+      message.error("Failed to search providers");
+    }
+  };
+
   const updateOne = async (record: ProviderDto) => {
     try {
       const { data } = await baseApi.put(`/providers/${record.id}`, record);
@@ -95,7 +107,13 @@ const ProviderList = ({
               overflow: "scroll",
             }}
           >
-            <Input.Search placeholder="Search" enterButton />
+            <Input.Search
+              placeholder="City, State, Name"
+              enterButton
+              onSearch={(value) => {
+                search(value);
+              }}
+            />
 
             <List
               itemLayout="horizontal"
