@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import { setupDatabase } from "./database";
 import searchRouter from "./routes/search.router";
-import propertyRouter from "./routes/property.router";
+import providerRouter from "./routes/property.router";
 import imagesRouter from "./routes/images.router";
 
 async function bootstrap() {
@@ -13,7 +13,7 @@ async function bootstrap() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use("/api/search", searchRouter);
-  app.use("/api/property", propertyRouter);
+  app.use("/api/providers", providerRouter);
   app.use("/api/images", imagesRouter);
 
   await setupDatabase();

@@ -10,13 +10,15 @@ services:
       - NODE_ENV=production
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+      - AWS_REGION=${AWS_REGION}
       - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_DB=${MYSQL_DB}
     command: ["yarn", "start"]
+    env_file:
+      - .env
     depends_on:
       - mysql
     
@@ -26,6 +28,12 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DB}
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    env_file:
+      - .env
     volumes:
       - ./mysql:/var/lib/mysql
 
