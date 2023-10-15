@@ -8,23 +8,21 @@ import imagesRouter from "./routes/images.router";
 
 async function bootstrap() {
   const app = express();
-  await setupDatabase();
 
+  app.use(cors());
   app.use(express.json());
-  app.use(
-    cors({
-      origin: "*",
-      methods: ["GET", "POST", "PUT", "DELETE"],
-    })
-  );
-
+  app.use(express.urlencoded({ extended: true }));
   app.use("/api/search", searchRouter);
-  app.use("/api/providers", propertyRouter);
+  app.use("/api/property", propertyRouter);
   app.use("/api/images", imagesRouter);
 
+  await setupDatabase();
+
   app.listen(PORT, () => {
-    console.log("Server listening on port " + PORT);
+    console.log(`Server is running on port ${PORT}`);
   });
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  console.error(err);
+});
