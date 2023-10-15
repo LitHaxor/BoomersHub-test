@@ -1,4 +1,4 @@
-name: CI/CD
+name: BoomersHub CI/CD
 on:
   push:
     branches:
@@ -30,9 +30,9 @@ jobs:
           file: ./dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/guber-api:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/guber-api:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/guber-api:buildcache,mode=max
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/boomers-hub:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/boomers-hub:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/boomers-hub:buildcache,mode=max
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
