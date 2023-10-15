@@ -48,22 +48,16 @@ providerRouter.get("/", async (req, res) => {
       .skip(Number(offset || 0));
 
     if (q) {
-      queryOption.andWhere("provider.name ILIKE :query", {
+      queryOption.andWhere("provider.name LIKE :query", {
         query: `%${q}%`,
       });
-      queryOption.orWhere("provider.address ILIKE :query", {
+      queryOption.orWhere("provider.address LIKE :query", {
         query: `%${q}%`,
       });
-      queryOption.orWhere("provider.city ILIKE :query", {
+      queryOption.orWhere("provider.city LIKE :query", {
         query: `%${q}%`,
       });
-      queryOption.orWhere("provider.zip ILIKE :query", { query: `%${q}%` });
-      queryOption.orWhere("provider.country ILIKE :query", {
-        query: `%${q}%`,
-      });
-      queryOption.orWhere("provider.type ILIKE :query", {
-        query: `%${q}%`,
-      });
+      queryOption.orWhere("provider.state LIKE :query", { query: `%${q}%` });
     }
 
     const [providers, count] = await queryOption.getManyAndCount();

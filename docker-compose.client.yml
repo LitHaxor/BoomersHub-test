@@ -1,0 +1,12 @@
+version: "3.6"
+
+services:
+  client: 
+    image: lithasan/boomers-client:latest
+    restart: always
+    ports:
+      - "80:3000"
+    environment:
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=http://3.101.121.140:4000/api
+    command: ["yarn", "start"]

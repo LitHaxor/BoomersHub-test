@@ -3,6 +3,7 @@ version: "3.6"
 services:
   backend:
     image: lithasan/boomers-hub:latest
+    restart: always
     ports:
       - "4000:4000"
     environment:
@@ -25,6 +26,7 @@ services:
 
   mysql:
     image: mysql:5.7
+    restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DB}
