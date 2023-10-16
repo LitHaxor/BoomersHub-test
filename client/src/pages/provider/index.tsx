@@ -70,23 +70,6 @@ const ProviderList = ({
     }
   };
 
-  const updateOne = async (record: ProviderDto) => {
-    try {
-      const { data } = await baseApi.put(`/providers/${record.id}`, record);
-      const newProviders = providers.map((provider) => {
-        if (provider.id === record.id) {
-          return { ...provider, ...record };
-        }
-        return provider;
-      });
-      setProviders(newProviders);
-      message.success(data.message);
-    } catch (error) {
-      console.log(error);
-      message.error("Failed to update provider");
-    }
-  };
-
   return (
     <Card
       title="Saved Providers"
@@ -161,7 +144,7 @@ const ProviderList = ({
                         <HomeFilled /> {item.address}
                       </p>
                       <p>
-                        {item.city}, {item.state} {item.zip}
+                        {item.city}, {item.country}, {item.state}, {item.zip}
                       </p>
                       <p>
                         <PhoneOutlined />
@@ -169,14 +152,6 @@ const ProviderList = ({
                       </p>
 
                       <Space>
-                        <Button
-                          type="dashed"
-                          onClick={() => {
-                            setSelectedRecord(item);
-                          }}
-                        >
-                          Update
-                        </Button>
                         <Popconfirm
                           title="Delete saved provider?"
                           description="Are you sure to delete this provider?"
@@ -185,7 +160,7 @@ const ProviderList = ({
                           okText="Yes"
                           cancelText="No"
                         >
-                          <Button danger>Delete</Button>
+                          <Button danger>Remove</Button>
                         </Popconfirm>
                       </Space>
                     </Space>

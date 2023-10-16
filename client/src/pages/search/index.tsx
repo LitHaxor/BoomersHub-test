@@ -57,6 +57,33 @@ const SearchProvider = ({
     }
   };
 
+  const bulkSave = async () => {
+    try {
+      const selectedRecords = providers.filter(
+        (provider) =>
+          selectedRowKeys.includes(provider.phone) && !provider.isSaved
+      );
+
+      const { data, status } = await baseApi.post("/providers/bulk", {
+        providers: selectedRecords,
+      });
+
+      if (status === 201) {
+        const newProviders = providers.map((provider) => {
+          if (selectedRowKeys.includes(provider.phone)) {
+            return { ...provider, isSaved: true };
+          }
+          return provider;
+        });
+        message.success(data.message);
+        setProviders(newProviders);
+      }
+    } catch (error) {
+      console.log(error);
+      message.error("Failed to save providers");
+    }
+  };
+
   const columns: ColumnsType<ProviderDto> = [
     {
       title: "Name",

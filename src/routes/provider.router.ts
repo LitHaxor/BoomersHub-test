@@ -84,6 +84,34 @@ providerRouter.post("/", async (req, res) => {
   });
 });
 
+providerRouter.post("/bulk", async (req, res) => {
+  try {
+    const existing = 0;
+    const newProviders = 0;
+    const requested = (req.body as Provider[]).length;
+    for await (const provider of req.body as Provider[]) {
+      const existingProvider = await providerRepository.findOne({
+        where: { phone: provider.phone },
+      });
+      if (existingProvider) {
+        continue;
+      }
+      await providerRepository.save(provider);
+    }
+    return res.status(201).json({
+      message: "Providers saved successfully",
+      existing,
+      newProviders,
+      requested,
+    });
+  } catch (error) {
+    throw new HttpRequestError({
+      code: 500,
+      message: `Error while bulk saving providers`,
+    });
+  }
+});
+
 providerRouter.get("/:id", findPropertyById, (req: CustomRequest, res) => {
   res.json(req.property);
 });
