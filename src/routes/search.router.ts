@@ -12,7 +12,7 @@ searchRouter.post("/", async (req, res) => {
   try {
     const body = req.body as SearchDto;
 
-    const data = await Websites[body.type].search(body.query);
+    const data = (await Websites[body.type].search(body.query)) || [];
 
     const phoneNumbers = [] as string[];
 
