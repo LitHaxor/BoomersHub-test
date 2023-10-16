@@ -86,10 +86,16 @@ providerRouter.post("/", async (req, res) => {
 
 providerRouter.post("/bulk", async (req, res) => {
   try {
+    const providers = req.body.providers as Provider[];
+    if (!providers || providers.length === 0) {
+      return res.status(400).json({ message: "No providers provided" });
+    }
+
     const existing = 0;
     const newProviders = 0;
-    const requested = (req.body as Provider[]).length;
-    for await (const provider of req.body as Provider[]) {
+    const requested = providers.length;
+
+    for await (const provider of providers as Provider[]) {
       const existingProvider = await providerRepository.findOne({
         where: { phone: provider.phone },
       });
@@ -105,10 +111,7 @@ providerRouter.post("/bulk", async (req, res) => {
       requested,
     });
   } catch (error) {
-    throw new HttpRequestError({
-      code: 500,
-      message: `Error while bulk saving providers`,
-    });
+    return res.status(500).json({ message: "Error while saving bulk" });
   }
 });
 

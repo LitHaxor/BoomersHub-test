@@ -170,7 +170,9 @@ const SearchProvider = ({
                   </Col>
                   {selectedRowKeys.length > 0 && (
                     <Col>
-                      <Button danger>Save Selected Providers</Button>
+                      <Button onClick={() => bulkSave()} danger>
+                        Save Selected Providers
+                      </Button>
                     </Col>
                   )}
                 </Space>
