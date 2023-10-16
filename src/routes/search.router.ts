@@ -14,7 +14,14 @@ searchRouter.post("/", async (req, res) => {
 
     const data = await Websites[body.type].search(body.query);
 
-    const phoneNumbers = data.map((property) => property.phone);
+    const phoneNumbers = [] as string[];
+
+    for (const provider of data) {
+      const { phone } = provider;
+      if (phone && phone.length > 0) {
+        phoneNumbers.push(phone);
+      }
+    }
 
     const savedProviders = await providerRepositry
       .createQueryBuilder("property")
