@@ -150,6 +150,14 @@ const SearchProvider = ({
     },
   ];
 
+  const resultText = () => {
+    if (providers.length === 0) {
+      return `No results found for "${query}" in ${state}`;
+    }
+
+    return `Found ${providers.length} results for "${query}" in ${state}`;
+  };
+
   return (
     <>
       <Head>
@@ -157,7 +165,7 @@ const SearchProvider = ({
       </Head>
       <Layout.Content style={{ padding: "10px" }}>
         <Card
-          title={`Showing results for "${query}" in ${state}`}
+          title={resultText()}
           style={{ borderRadius: 10, boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)" }}
         >
           <Table
@@ -203,8 +211,9 @@ const SearchProvider = ({
 export default SearchProvider;
 
 export async function getServerSideProps(context: NextPageContext) {
+  const { query } = context;
+
   try {
-    const { query } = context;
     const { data } = await baseApi.post<ProviderDto[]>("/search", {
       query: query.q,
       type: query.state,
@@ -222,6 +231,8 @@ export async function getServerSideProps(context: NextPageContext) {
     return {
       props: {
         data: [],
+        query: query.q,
+        state: query.state,
       },
     };
   }

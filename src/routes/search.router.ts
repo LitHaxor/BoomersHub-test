@@ -23,16 +23,20 @@ searchRouter.post("/", async (req, res) => {
       }
     }
 
-    const savedProviders = await providerRepositry
-      .createQueryBuilder("property")
-      .where("property.phone IN (:...phoneNumbers)", { phoneNumbers })
-      .getMany();
+    if (phoneNumbers.length > 0) {
+      const savedProviders = await providerRepositry
+        .createQueryBuilder("property")
+        .where("property.phone IN (:...phoneNumbers)", { phoneNumbers })
+        .getMany();
 
-    const savedPhoneNumbers = savedProviders.map((provider) => provider.phone);
+      const savedPhoneNumbers = savedProviders.map(
+        (provider) => provider.phone
+      );
 
-    data.forEach((proivder) => {
-      proivder.isSaved = savedPhoneNumbers.includes(proivder.phone);
-    });
+      data.forEach((proivder) => {
+        proivder.isSaved = savedPhoneNumbers.includes(proivder.phone);
+      });
+    }
 
     return res.json(data);
   } catch (error) {
