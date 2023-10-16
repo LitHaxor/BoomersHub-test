@@ -15,6 +15,7 @@ import {
   Space,
   message,
 } from "antd";
+import axios from "axios";
 import { NextPageContext } from "next";
 import React from "react";
 
@@ -26,9 +27,13 @@ const ProviderList = ({
     data.providers
   );
 
+  const baseApiClient = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://3.101.121.140:4000/api",
+  });
+
   const deleteOne = async (record: ProviderDto) => {
     try {
-      const { data } = await baseApi.delete(`/providers/${record.id}`);
+      const { data } = await baseApiClient.delete(`/providers/${record.id}`);
       const newProviders = providers.filter(
         (provider) => provider.phone !== record.phone
       );
@@ -49,7 +54,7 @@ const ProviderList = ({
 
       const queryParams = new URLSearchParams(query).toString();
       const url = `/providers?${queryParams}`;
-      const { data } = await baseApi.get<ProviderGetDto>(url, {});
+      const { data } = await baseApiClient.get<ProviderGetDto>(url, {});
 
       setProviders([...providers, ...data.providers]);
     } catch (error) {
@@ -60,7 +65,7 @@ const ProviderList = ({
 
   const search = async (query: string) => {
     try {
-      const { data } = await baseApi.get<ProviderGetDto>(
+      const { data } = await baseApiClient.get<ProviderGetDto>(
         `/providers?q=${query}`
       );
       setProviders(data.providers);

@@ -1,4 +1,4 @@
-import { baseApi } from "@/baseApi";
+import axios from "axios";
 import { ProviderDto } from "@/dto/search.dto";
 import { NextPageContext } from "next";
 import React from "react";
@@ -17,6 +17,7 @@ import { ColumnsType } from "antd/es/table";
 import Head from "next/head";
 import ProviderView from "@/components/Drawers/ProviderView";
 import Link from "next/link";
+import { baseApi } from "@/baseApi";
 
 const SearchProvider = ({
   data,
@@ -31,6 +32,10 @@ const SearchProvider = ({
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>([]);
   const [providers, setProviders] = React.useState<ProviderDto[]>(data);
 
+  const baseApiClient = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://3.101.121.140:4000/api",
+  });
+
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -42,7 +47,7 @@ const SearchProvider = ({
 
   const singleSave = async (record: ProviderDto) => {
     try {
-      const { data } = await baseApi.post("/providers", record);
+      const { data } = await baseApiClient.post("/providers", record);
       const newProviders = providers.map((provider) => {
         if (provider.phone === record.phone) {
           return { ...provider, isSaved: true };
@@ -64,7 +69,7 @@ const SearchProvider = ({
           selectedRowKeys.includes(provider.phone) && !provider.isSaved
       );
 
-      const { data, status } = await baseApi.post("/providers/bulk", {
+      const { data, status } = await baseApiClient.post("/providers/bulk", {
         providers: selectedRecords,
       });
 
