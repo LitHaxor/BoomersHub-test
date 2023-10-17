@@ -123,6 +123,11 @@ const SearchProvider = ({
       key: "phone",
     },
     {
+      title: "Code",
+      dataIndex: "code",
+      key: "code",
+    },
+    {
       title: "Type",
       dataIndex: "type",
       key: "type",

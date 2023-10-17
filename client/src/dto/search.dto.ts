@@ -13,6 +13,7 @@ export type ProviderDto = {
   phone: string;
   state?: string;
   isSaved?: boolean;
+  code?: number;
   link?: string;
   createdAt?: Date;
   updatedAt?: Date;

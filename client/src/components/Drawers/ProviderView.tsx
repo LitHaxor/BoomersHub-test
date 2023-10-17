@@ -21,6 +21,11 @@ const ProviderView = ({ selectedProvider }: ProviderViewProps) => {
           <Typography.Title level={2}>{selectedProvider.name}</Typography.Title>
           <Typography.Paragraph>
             Type: {selectedProvider.type}
+            {selectedProvider.code && (
+              <Typography.Text type="secondary">
+                {"code: "}({selectedProvider.code})
+              </Typography.Text>
+            )}
           </Typography.Paragraph>
           <Divider />
         </Col>
