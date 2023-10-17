@@ -1,7 +1,7 @@
 import { CheerioAPI, load } from "cheerio";
 import { getBrowser } from "../libs/playwright";
 import { Provider } from "../entities/Provider.entity";
-import { getLatLong } from "src/libs/geo";
+import { getLatLong } from "../libs/geo";
 
 export class Florida {
   static instance: Florida;
