@@ -171,6 +171,13 @@ const ProviderList = ({
                           <a href={`tel:${item.phone}`}>{item.phone}</a>
                         </p>
 
+                        {item.code && (
+                          <p>
+                            <span>Code: </span>
+                            <span>{item.code}</span>
+                          </p>
+                        )}
+
                         <p>
                           <a href={item.link}>{item.link}</a>
                         </p>
