@@ -27,6 +27,7 @@ const ProviderList = ({
   const [providers, setProviders] = React.useState<ProviderDto[]>(
     data.providers
   );
+  const [loading, setLoading] = React.useState(false);
 
   const baseApiClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || "http://3.101.121.140:4000/api",
@@ -48,6 +49,7 @@ const ProviderList = ({
 
   const loadMore = async () => {
     try {
+      setLoading(true);
       const query = {
         limit: "10",
         offset: providers.length.toString(),
@@ -58,21 +60,26 @@ const ProviderList = ({
       const { data } = await baseApiClient.get<ProviderGetDto>(url, {});
 
       setProviders([...providers, ...data.providers]);
+      setLoading(false);
     } catch (error) {
       console.log(error);
       message.error("Failed to load more providers");
+      setLoading(false);
     }
   };
 
   const search = async (query: string) => {
     try {
+      setLoading(true);
       const { data } = await baseApiClient.get<ProviderGetDto>(
         `/providers?q=${query}`
       );
       setProviders(data.providers);
+      setLoading(false);
     } catch (error) {
       console.log(error);
       message.error("Failed to search providers");
+      setLoading(false);
     }
   };
 
@@ -113,6 +120,7 @@ const ProviderList = ({
               <List
                 itemLayout="horizontal"
                 dataSource={providers}
+                loading={loading}
                 loadMore={
                   data.count > providers.length ? (
                     <div

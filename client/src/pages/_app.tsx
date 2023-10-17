@@ -17,6 +17,14 @@ const App = ({ Component, pageProps }: AppProps) => (
     <Loading>
       <Component {...pageProps} />
     </Loading>
+    <Layout>
+      <Layout.Footer style={{ textAlign: "center" }}>
+        {"Boomershub Test ©2023 "}
+        <a href="https://github.com/LitHaxor/BoomersHub-test" className="">
+          Github
+        </a>
+      </Layout.Footer>
+    </Layout>
   </ConfigProvider>
 );
 
