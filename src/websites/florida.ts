@@ -1,6 +1,7 @@
 import { CheerioAPI, load } from "cheerio";
 import { getBrowser } from "../libs/playwright";
 import { Provider } from "../entities/Provider.entity";
+import { getLatLong } from "src/libs/geo";
 
 export class Florida {
   static instance: Florida;
@@ -23,6 +24,7 @@ export class Florida {
 
   async scrapeProviders($: CheerioAPI) {
     const providers = [] as Provider[];
+    const promises = [] as Promise<any>[];
 
     const table = $("#ctl00_mainContentPlaceHolder_dgFacilities");
 
@@ -68,8 +70,22 @@ export class Florida {
 
       provider.link = `https://quality.healthfinder.fl.gov/facilitylocator/FacilityDetails.aspx?fid=${provider.code}`;
 
+      if (provider.address && provider.city && provider.state) {
+        promises.push(
+          getLatLong(provider.address, provider.city, provider.state).then(
+            (data) => {
+              if (data) {
+                provider.latitude = data.latitude;
+                provider.longitude = data.longitude;
+              }
+            }
+          )
+        );
+      }
       providers.push(provider);
     });
+
+    await Promise.all(promises);
 
     return providers;
   }
