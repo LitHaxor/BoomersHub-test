@@ -38,8 +38,14 @@ export class Florida {
       const provider = {} as Provider;
 
       console.log(cells.length);
+      const name = $(cells[0]).text()?.trim();
 
-      provider.name = $(cells[0]).text()?.trim();
+      if (name?.split("-")?.length > 1) {
+        provider.name = name?.split("-")?.[0].trim();
+        provider.code = Number(name?.split("-")?.[1].trim());
+      } else {
+        provider.name = name;
+      }
 
       provider.type = $(cells[1]).text();
 
@@ -59,6 +65,8 @@ export class Florida {
       );
 
       provider.capacity = Number($(cells[7]).text() || 0);
+
+      provider.link = `https://quality.healthfinder.fl.gov/facilitylocator/FacilityDetails.aspx?fid=${provider.code}`;
 
       providers.push(provider);
     });

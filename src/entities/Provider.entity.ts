@@ -35,7 +35,12 @@ export class Provider {
     unique: true,
     nullable: true,
   })
-  phone: string;
+  phone?: string;
+
+  @Column({
+    nullable: true,
+  })
+  link?: string;
 
   @Column()
   type: string;
@@ -46,6 +51,11 @@ export class Provider {
     nullable: true,
   })
   capacity?: number;
+
+  @Column({
+    nullable: true,
+  })
+  code?: number;
 
   @Column({
     type: "text",

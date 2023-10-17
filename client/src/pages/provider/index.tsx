@@ -17,7 +17,8 @@ import {
 } from "antd";
 import axios from "axios";
 import { NextPageContext } from "next";
-import React from "react";
+import Head from "next/head";
+import React, { useEffect } from "react";
 
 const ProviderList = ({
   data,
@@ -76,140 +77,151 @@ const ProviderList = ({
   };
 
   return (
-    <Card
-      title="Saved Providers"
-      style={{
-        margin: "10px",
-        borderRadius: "10px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
-      }}
-    >
-      <Row gutter={[16, 16]}>
-        <Col span={8}>
-          <Card
-            title="Providers"
-            style={{
-              borderRadius: 10,
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
-              maxHeight: "80vh",
-              overflow: "scroll",
-            }}
-          >
-            <Input.Search
-              placeholder="City, State, Name"
-              enterButton
-              onSearch={(value) => {
-                search(value);
+    <>
+      <Head>
+        <title>BommerHub - Saved Providers</title>
+        <meta name="description" content="Saved Providers" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Card
+        title="Saved Providers"
+        style={{
+          margin: "10px",
+          borderRadius: "10px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
+        }}
+      >
+        <Row gutter={[16, 16]}>
+          <Col span={8}>
+            <Card
+              title="Providers"
+              style={{
+                borderRadius: 10,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
+                maxHeight: "80vh",
+                overflow: "scroll",
               }}
-            />
+            >
+              <Input.Search
+                placeholder="City, State, Name"
+                enterButton
+                onSearch={(value) => {
+                  search(value);
+                }}
+              />
 
-            <List
-              itemLayout="horizontal"
-              dataSource={providers}
-              loadMore={
-                data.count > providers.length ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Button
-                      type="primary"
-                      onClick={() => {
-                        loadMore();
+              <List
+                itemLayout="horizontal"
+                dataSource={providers}
+                loadMore={
+                  data.count > providers.length ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                       }}
                     >
-                      Load More
-                    </Button>
-                  </div>
-                ) : null
-              }
-              renderItem={(item) => (
-                <List.Item>
-                  <Card
-                    title={item.name}
-                    extra={
                       <Button
-                        type="link"
-                        onClick={() => setSelectedRecord(item)}
+                        type="primary"
+                        onClick={() => {
+                          loadMore();
+                        }}
                       >
-                        View
+                        Load More
                       </Button>
-                    }
-                    style={{
-                      width: 500,
-                      borderRadius: 10,
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
-                    }}
-                  >
-                    <Space direction="vertical">
-                      <p>
-                        <HomeFilled /> {item.address}
-                      </p>
-                      <p>
-                        {item.city}, {item.country}, {item.state}, {item.zip}
-                      </p>
-                      <p>
-                        <PhoneOutlined />
-                        <a href={`tel:${item.phone}`}>{item.phone}</a>
-                      </p>
-
-                      <Space>
-                        <Popconfirm
-                          title="Delete saved provider?"
-                          description="Are you sure to delete this provider?"
-                          onConfirm={() => deleteOne(item)}
-                          onCancel={() => {}}
-                          okText="Yes"
-                          cancelText="No"
+                    </div>
+                  ) : null
+                }
+                renderItem={(item) => (
+                  <List.Item>
+                    <Card
+                      title={item.name}
+                      extra={
+                        <Button
+                          type="link"
+                          onClick={() => setSelectedRecord(item)}
                         >
-                          <Button danger>Remove</Button>
-                        </Popconfirm>
+                          View
+                        </Button>
+                      }
+                      style={{
+                        width: 500,
+                        borderRadius: 10,
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
+                      }}
+                    >
+                      <Space direction="vertical">
+                        <p>
+                          <HomeFilled /> {item.address}
+                        </p>
+                        <p>
+                          {item.city}, {item.country}, {item.state}, {item.zip}
+                        </p>
+                        <p>
+                          <PhoneOutlined />
+                          <a href={`tel:${item.phone}`}>{item.phone}</a>
+                        </p>
+
+                        <p>
+                          <a href={item.link}>{item.link}</a>
+                        </p>
+
+                        <Space>
+                          <Popconfirm
+                            title="Delete saved provider?"
+                            description="Are you sure to delete this provider?"
+                            onConfirm={() => deleteOne(item)}
+                            onCancel={() => {}}
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <Button danger>Remove</Button>
+                          </Popconfirm>
+                        </Space>
                       </Space>
-                    </Space>
-                  </Card>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
-        <Col span={16}>
-          <Card
-            title="Map"
-            style={{
-              borderRadius: 10,
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
-            }}
-          >
-            {providers && (
-              <MapView
-                defaultCenter={[
-                  providers[0]?.latitude,
-                  providers[0]?.longitude,
-                ]}
-                defaultZoom={5}
-                multipleCenter={providers?.map((item) => [
-                  item.latitude,
-                  item.longitude,
-                ])}
-                height={460}
-                title={null}
+                    </Card>
+                  </List.Item>
+                )}
               />
-            )}
-          </Card>
-        </Col>
-      </Row>
-      <Drawer
-        title="Provider Details"
-        width={600}
-        onClose={() => setSelectedRecord(undefined)}
-        open={!!selectedRecord}
-      >
-        {selectedRecord && <ProviderView selectedProvider={selectedRecord} />}
-      </Drawer>
-    </Card>
+            </Card>
+          </Col>
+          <Col span={16}>
+            <Card
+              title="Map"
+              style={{
+                borderRadius: 10,
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.09)",
+              }}
+            >
+              {providers && (
+                <MapView
+                  defaultCenter={[
+                    providers[0]?.latitude,
+                    providers[0]?.longitude,
+                  ]}
+                  defaultZoom={5}
+                  multipleCenter={providers?.map((item) => [
+                    item.latitude,
+                    item.longitude,
+                  ])}
+                  height={460}
+                  title={null}
+                />
+              )}
+            </Card>
+          </Col>
+        </Row>
+        <Drawer
+          title="Provider Details"
+          width={600}
+          onClose={() => setSelectedRecord(undefined)}
+          open={!!selectedRecord}
+        >
+          {selectedRecord && <ProviderView selectedProvider={selectedRecord} />}
+        </Drawer>
+      </Card>
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ProviderDto } from "@/dto/search.dto";
 import { NextPageContext } from "next";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Card,
@@ -49,7 +49,9 @@ const SearchProvider = ({
     try {
       const { data } = await baseApiClient.post("/providers", record);
       const newProviders = providers.map((provider) => {
-        if (provider.phone === record.phone) {
+        const unqID = `${provider.name}-${provider.phone}-${provider.address}`;
+        const recordID = `${record.name}-${record.phone}-${record.address}`;
+        if (unqID === recordID) {
           return { ...provider, isSaved: true };
         }
         return provider;
@@ -161,7 +163,11 @@ const SearchProvider = ({
   return (
     <>
       <Head>
-        <title>BoomersHub - Search</title>
+        <title>{`Boomershub- Search for ${query}`}</title>
+        <meta
+          name="description"
+          content={`Search for ${query} in ${state} on Boomershub`}
+        />
       </Head>
       <Layout.Content style={{ padding: "10px" }}>
         <Card

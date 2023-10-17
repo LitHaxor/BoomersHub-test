@@ -86,6 +86,7 @@ export class TexasLTC {
       provider.type = $(columns[5]).text();
       provider.state = "Texas";
       const url = this.baseUrl + "/" + $(columns[0]).find("a").attr("href");
+      provider.link = url;
 
       if (url) {
         // Push the promise returned by scrapeDetailsPage into the promises array
@@ -101,18 +102,24 @@ export class TexasLTC {
       }
 
       // Push the promise returned by getLatLong into the promises array
-      promises.push(
-        getLatLong(provider.address, provider.city, provider.state).then(
-          (data) => {
-            if (data) {
-              provider.latitude = data.latitude;
-              provider.longitude = data.longitude;
+      if (
+        provider.address &&
+        (provider.city || provider.name) &&
+        provider.state
+      ) {
+        promises.push(
+          getLatLong(provider.address, provider.city, provider.state).then(
+            (data) => {
+              if (data) {
+                provider.latitude = data.latitude;
+                provider.longitude = data.longitude;
+              }
             }
-          }
-        )
-      );
+          )
+        );
 
-      providers.push(provider);
+        providers.push(provider);
+      }
     });
 
     // Wait for all promises to resolve before continuing

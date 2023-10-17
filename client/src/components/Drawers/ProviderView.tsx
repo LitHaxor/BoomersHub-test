@@ -71,10 +71,17 @@ const ProviderView = ({ selectedProvider }: ProviderViewProps) => {
             </Space>
           </Typography.Paragraph>
 
-          <Typography.Title level={3}>Website</Typography.Title>
+          {selectedProvider.link && (
+            <Space direction="vertical">
+              <Typography.Title level={3}>Website</Typography.Title>
+
+              <Typography.Link href={selectedProvider.link}>
+                visit website
+              </Typography.Link>
+            </Space>
+          )}
         </Col>
       </Row>
-      <Row></Row>
     </Space>
   );
 };

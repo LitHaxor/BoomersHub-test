@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { Provider } from "../entities/Provider.entity";
 import { AppDataSource } from "../database";
-import HttpRequestError from "../errors/HttpRequestError";
+import { getLatLong } from "../libs/geo";
 
 const providerRouter = express.Router();
 const providerRepository = AppDataSource.getRepository(Provider);
@@ -12,23 +12,24 @@ interface CustomRequest extends Request {
 
 const findPropertyById = async (
   req: CustomRequest,
-  _res: Response,
+  res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
-  const provider = await providerRepository.findOne({
-    where: { id: parseInt(id) },
-  });
-
-  if (!provider) {
-    throw new HttpRequestError({
-      code: 404,
-      message: `Provider with id ${id} not found`,
+  try {
+    const { id } = req.params;
+    const provider = await providerRepository.findOne({
+      where: { id: parseInt(id) },
     });
-  }
 
-  req.property = provider ? provider : undefined;
-  next();
+    if (!provider) {
+      res.status(404).json({ message: "Provider not found" });
+    }
+
+    req.property = provider ? provider : undefined;
+    next();
+  } catch (error) {
+    next(error);
+  }
 };
 
 providerRouter.get("/", async (req, res) => {
@@ -44,6 +45,7 @@ providerRouter.get("/", async (req, res) => {
     };
     const queryOption = providerRepository
       .createQueryBuilder("provider")
+      .orderBy("provider.created_at", "DESC")
       .take(Number(limit || 10))
       .skip(Number(offset || 0));
 
@@ -75,13 +77,36 @@ providerRouter.get("/", async (req, res) => {
 });
 
 providerRouter.post("/", async (req, res) => {
-  const providerData = req.body as Provider;
+  try {
+    const providerData = req.body as Provider;
 
-  const newProvider = await providerRepository.save(providerData);
-  return res.json({
-    message: "Provider saved!",
-    provider: newProvider,
-  });
+    if (!providerData) {
+      return res.status(400).json({ message: "No provider provided" });
+    }
+
+    if (!providerData.latitude || !providerData.longitude) {
+      const data = await getLatLong(
+        providerData.address,
+        providerData.city,
+        providerData.state
+      );
+
+      if (data) {
+        providerData.latitude = data.latitude;
+        providerData.longitude = data.longitude;
+      }
+    }
+
+    const newProvider = await providerRepository.save(providerData);
+
+    return res.json({
+      message: "Provider saved!",
+      provider: newProvider,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
 });
 
 providerRouter.post("/bulk", async (req, res) => {
@@ -102,6 +127,20 @@ providerRouter.post("/bulk", async (req, res) => {
       if (existingProvider) {
         continue;
       }
+
+      if (!provider.latitude || !provider.longitude) {
+        const data = await getLatLong(
+          provider.address,
+          provider.city,
+          provider.state
+        );
+
+        if (data) {
+          provider.latitude = data.latitude;
+          provider.longitude = data.longitude;
+        }
+      }
+
       await providerRepository.save(provider);
     }
     return res.status(201).json({
